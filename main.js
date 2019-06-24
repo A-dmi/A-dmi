@@ -59,7 +59,7 @@ function addEventMedia(){
 
 function showFulInfo(){
 	let url = '';
-	console.dir(this);
+	console.dir(this.dataset);
 	if(this.dataset.type === 'movie'){
 		url = 'https://api.themoviedb.org/3/movie/'+ this.dataset.id +'?api_key=33b6815092aa26daf965a142296b5d0d&language=ru';
 	}else if (this.dataset.type === 'tv') {
@@ -67,6 +67,9 @@ function showFulInfo(){
 	}else{
 		movie.innerHTML = '<h2 class="col-12 text-center text-danger">ERROR TRY LETTER</h2>';
 	}
+
+
+
 	fetch(url)
 		.then(function(value){
 			if(value.status !== 200){
@@ -75,10 +78,12 @@ function showFulInfo(){
 			return value.json();
 		})
 		.then(function(output){
+			console.log(output);
+			const poster = output.poster_path ? urlPoster + output.poster_path : './img/poster.jpg';
 			movie.innerHTML = `
 			<h4 class="col-12 text-center text-info">${output.name || output.title}</h4>
 			<div class="col-4">
-				<img src='${urlPoster + output.poster_path}' alt='${output.name || output.title}'>
+				<img src='${poster}' alt='${output.name || output.title}'>
 				${(output.homepage) ? `<p class="text-center"><a href="${output.homepage}" target="_blank">Offisial sate</a></p>` : ''}
 				${(output.imdb_id) ? `<p class="text-center"><a href="https://imdb.com/title/${output.indb_id}" target="_blank">Link on IMDB.com</a></p>` : ''}
 			</div>
@@ -86,8 +91,17 @@ function showFulInfo(){
 				<p>Rating: ${output.vote_average}</p>
 				<p>Status: ${output.status}</p>
 				<p>Premiere: ${output.first_air_date || output.release_date}</p>
+				${(output.last_episode_to_air) ? `<p>${output.number_of_seasons} seasons and series came out: ${output.last_episode_to_air.episode_number}` : ''} 
+				${(output.next_episode_to_air) ? `<p>Date of the the next episode: ${output.next_episode_to_air.air_date}` : ''} 
+				<p>Description: ${output.overview}</p>
+				<br>
+				<dir class='youtube'>
+
+				</dir>
 			</div>
 			`;
+
+			
 		})
 		.catch(function(reason){
 			movie.innerHTML = 'Something went wrong!';
