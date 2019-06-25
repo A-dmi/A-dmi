@@ -77,7 +77,7 @@ function showFulInfo(){
 			}
 			return value.json();
 		})
-		.then(function(output){
+		.then((output)=>{
 			console.log(output);
 			const poster = output.poster_path ? urlPoster + output.poster_path : './img/poster.jpg';
 			movie.innerHTML = `
@@ -101,7 +101,7 @@ function showFulInfo(){
 			</div>
 			`;
 
-			
+			getVideo(this.dataset.type, this.dataset.id);
 		})
 		.catch(function(reason){
 			movie.innerHTML = 'Something went wrong!';
@@ -141,6 +141,33 @@ document.addEventListener('DOMContentLoaded', function(){
 		})
 		.catch(function(reason){
 			movie.innerHTML = 'Something went wrong!';
-			console.log('error: ' + request.status);
+			console.error(reason || reason.status);
 		});
 })
+
+function getVideo(type, id){
+	let youtube = movie.querySelector('.youtube');
+fetch(`https://api.themoviedb.org/3/${type}/${id}/videos?api_key=33b6815092aa26daf965a142296b5d0d&language=ru`)
+	.then((value)=>{
+			if(value.status !== 200){
+				return Promise.reject(new Error(value.status));
+			}
+			return value.json();
+		})
+.then((output)=>{
+	let videoFrame = '<h5 class="text-info">Video</h5>';
+	if(output.results.length === 0){
+		videoFrame = '<p>We don`t have video</p>';
+	}
+	output.results.forEach((item)=>{
+		videoFrame += '<iframe width="560" height="315" src="https://www.youtube.com/embed/'+ item.key +'" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+	});
+	youtube.innerHTML = videoFrame;
+})
+.catch((reason)=>{
+	movie.innerHTML = 'We don`t have video!';
+	console.error(reason || reason.status);
+});
+
+	youtube.innerHTML = type;
+}
